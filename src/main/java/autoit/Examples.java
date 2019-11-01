@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 
 @Component
 public class Examples {
@@ -12,13 +14,13 @@ public class Examples {
     private final AutoItX au;
     private static final Logger log = LoggerFactory.getLogger(Examples.class);
 
-    public Examples(AutoItX au) throws InterruptedException {
+    public Examples(AutoItX au) throws InterruptedException, IOException {
         this.au = au;
         main();
     }
 
-    private void main() throws InterruptedException {
-        calculatorTest("Számológép");
+    private void main() throws InterruptedException, IOException {
+        calculatorTest("Calculator");
         // copyPasteTest("new", "old");
     }
 
@@ -48,8 +50,8 @@ public class Examples {
         au.setOption("WinTitleMatchMode", "2");
         au.winActivate(fromWindowName);
         au.winWaitActive(fromWindowName, "", 5);
-        au.send("{home}", false);
-        au.send("+{end}", false);
+        au.send("{HOME}", false);
+        au.send("+{END}", false);
         au.send("^c", false);
         au.winActivate(toWindowName);
         au.winWaitActive(toWindowName, "", 5);

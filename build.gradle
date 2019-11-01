@@ -4,9 +4,14 @@ buildscript {
     }
     repositories {
         mavenCentral()
+        jcenter()
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        //classpath 'gradle.plugin.edu.sc.seis.gradle:launch4j:2.4.5'
     }
 }
 
@@ -16,8 +21,9 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
-version =  '0.1.0'
+//apply plugin: 'edu.sc.seis.launch4j'
 
+version =  '0.1.0'
 group 'autoit'
 version '1.0-SNAPSHOT'
 
@@ -26,7 +32,17 @@ sourceCompatibility = 1.8
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url 'https://plugins.gradle.org/m2/'
+    }
 }
+
+//launch4j {
+//    mainClassName = 'autoit.Application'
+//    outfile = 'Autoit.exe'
+//    //icon = "${projectDir}/src/main/resources/icon/autoit.ico"
+//    jreMinVersion = "1.8.0"
+//}
 
 dependencies {
     compile group: 'com.hynnet', name: 'jacob', version: '1.18'
@@ -38,5 +54,5 @@ dependencies {
 
     annotationProcessor 'org.projectlombok:lombok'
     compileOnly 'org.projectlombok:lombok'
-
+    //compile group: 'gradle.plugin.edu.sc.seis.gradle', name: 'launch4j', version: '2.4.5'
 }
