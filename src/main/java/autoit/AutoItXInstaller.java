@@ -73,7 +73,7 @@ class AutoItXInstaller {
         String command = REGSVR_SERVICE_64 +
                 REGSVR_UNINSTALL_SWITCH.apply(uninstall) +
                 REGSVR_SILENT_SWITCH.apply(silent) + " " +
-                new ClassPathResource(AUTOITX_DLL_TO_USE).getFile().getAbsolutePath();
+                '"' + new ClassPathResource(AUTOITX_DLL_TO_USE).getFile().getAbsolutePath() + '"';
         try {
             Process process = runtime.exec(command);
             process.waitFor();
