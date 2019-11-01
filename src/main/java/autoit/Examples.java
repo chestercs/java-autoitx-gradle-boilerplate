@@ -19,9 +19,13 @@ public class Examples {
         main();
     }
 
+
+    // Hint:
+    // You can turn off autoit.skip.dll.installation.scan in application.properties,
+    // After first run. So it will skip scanning autoit installation
     private void main() throws InterruptedException, IOException {
         calculatorTest("Calculator");
-        // copyPasteTest("new", "old");
+        // copyPasteTest("old", "new");
     }
 
 
@@ -59,5 +63,4 @@ public class Examples {
         au.send("{ENTER}", false);
         log.info(au.clipGet());
     }
-
 }

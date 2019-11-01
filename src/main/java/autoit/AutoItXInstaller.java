@@ -25,7 +25,7 @@ class AutoItXInstaller {
     private static final String REGSVR_SERVICE_32 = "/Windows/SysWoW64/regsvr32.exe"; // TODO: Wire this
     private static final Function<Boolean, String> REGSVR_UNINSTALL_SWITCH = unintall -> unintall ? " -u" : "";
     private static final Function<Boolean, String> REGSVR_SILENT_SWITCH = unintall -> unintall ? " -s" : "";
-    private static final String AUTOITX_DLL_TO_USE = JVM_ARCHITECH_32 ? "AutoItX3.dll" : "AutoItX3_x64.dll";
+    private static final String AUTOITX_DLL_TO_USE = JVM_ARCHITECH_32 ? "autoit/AutoItX3.dll" : "autoit/AutoItX3_x64.dll";
     private String errorCode = "-1";
     private Boolean uninstall;
     private Boolean silent;
@@ -38,28 +38,36 @@ class AutoItXInstaller {
         this.env = env;
     }
 
-    void installAutoItDll() throws IOException {
-        if (env.getProperty("autoit.skip.dll.installation.scan", Boolean.class, false)) {
-            return; // Skip installation scan
-        }
-
-        boolean installed = checkIsItInstalled().equals("checker_1");
-        log.info(logger());
-        if ((installed && uninstall) || (!installed && !uninstall)) {
-            install();
-            log.info(logger());
-            if (uninstall) {
-                System.exit(0);
-            }
-        }
-    }
-
     AutoItX initAutoIt() throws IOException {
-        String JACOB_DLL_TO_USE = JVM_ARCHITECH_32 ? "jacob-1.19-x86.dll" : "jacob-1.19-x64.dll";
+        String JACOB_DLL_TO_USE = JVM_ARCHITECH_32 ? "autoit/jacob-1.19-x86.dll" : "autoit/jacob-1.19-x64.dll";
         System.setProperty(LibraryLoader.JACOB_DLL_PATH, new ClassPathResource(JACOB_DLL_TO_USE).getFile().getAbsolutePath());
         return new AutoItX();
     }
 
+    void installAutoItDll() throws Exception {
+        if (env.getProperty("autoit.skip.dll.installation.scan", Boolean.class, false)) {
+            return; // Skip installation
+        }
+
+        log.info("Checking AutoIt installation");
+        boolean installed = !checkIsItInstalled().equals("checker_1");
+        log.info("AutoIt already installed: " + installed);
+        log.info(logger());
+
+        if (uninstall && !installed) {
+            log.info("Autoit already uninstalled.");
+            System.exit(0);
+        }
+        if (uninstall && installed) {
+            install();
+            log.info("Autoit uninstalled.");
+            System.exit(0);
+        }
+        if (!uninstall && !installed) {
+            install();
+            log.info("Autoit installed.");
+        }
+    }
 
     private String install() throws IOException {
         String command = REGSVR_SERVICE_64 +
@@ -101,7 +109,7 @@ class AutoItXInstaller {
         }
     }
 
-    private String checkIsItInstalled() {
+    private String checkIsItInstalled() { // TODO: BUGFIX | This method is not reliable..
         String command = "reg query HKLM\\SOFTWARE\\Classes /s /f " + AUTOITX_DLL_TO_USE;
 
         try {

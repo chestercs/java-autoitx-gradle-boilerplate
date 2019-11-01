@@ -15,7 +15,7 @@ public class Application {
     }
 
     @Bean
-    public AutoItX autoitBean(AutoItXInstaller autoItXInstaller) throws IOException {
+    public AutoItX autoitBean(AutoItXInstaller autoItXInstaller) throws Exception {
         autoItXInstaller.installAutoItDll();
         return autoItXInstaller.initAutoIt();
     }
