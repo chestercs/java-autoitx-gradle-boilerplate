@@ -1,4 +1,4 @@
-package autoit;
+package application.autoit;
 
 import autoitx4java.AutoItX;
 import com.jacob.com.LibraryLoader;
@@ -26,45 +26,65 @@ public class AutoItXInstaller {
     private static final Function<Boolean, String> REGSVR_SILENT_SWITCH = unintall -> unintall ? " -s" : "";
     private static final String AUTOITX_DLL_TO_USE = JVM_ARCHITECH_32 ? "autoit/AutoItX3.dll" : "autoit/AutoItX3_x64.dll";
     private String errorCode = "-1";
+    private Boolean skipInstall;
     private Boolean uninstall;
     private Boolean silent;
     private Runtime runtime = Runtime.getRuntime();
     private final Environment env;
 
     public AutoItXInstaller(Environment env) {
-        this.uninstall = env.getProperty("autoit.skip.dll.installation.uninstall", Boolean.class, false);
-        this.silent = env.getProperty("autoit.skip.dll.installation.silent", Boolean.class, false);
+        this.skipInstall = env.getProperty("autoit.installation.skip", Boolean.class, false);
+        this.uninstall = env.getProperty("autoit.installation.uninstall", Boolean.class, false);
+        this.silent = env.getProperty("autoit.installation.silent", Boolean.class, true);
         this.env = env;
     }
 
     @Bean
     public AutoItX initAutoIt() throws IOException {
         String JACOB_DLL_TO_USE = JVM_ARCHITECH_32 ? "autoit/jacob-1.19-x86.dll" : "autoit/jacob-1.19-x64.dll";
-        System.setProperty(LibraryLoader.JACOB_DLL_PATH,
-                ResourceUtils.getFile("classpath:" + JACOB_DLL_TO_USE).getAbsolutePath());
-        return new AutoItX();
+        String JACOB_DLL_ABSOLUTE_PATH = ResourceUtils.getFile("classpath:" + JACOB_DLL_TO_USE).getAbsolutePath();
+        System.setProperty(LibraryLoader.JACOB_DLL_PATH, JACOB_DLL_ABSOLUTE_PATH);
+        AutoItX autoItX;
+
+        if (uninstall) {
+            installAutoItDll();
+        }
+
+        try {
+            autoItX = new AutoItX();
+        } catch (Exception e) {
+            log.error("Failed to initialize Autoit: ", e.toString());
+            try {
+                installAutoItDll();
+            } catch (IOException einstall) {
+                log.error("Failed to install Autoit: ", einstall.toString());
+            } finally {
+                autoItX = new AutoItX();
+            }
+        }
+        return autoItX;
     }
 
-    public void installAutoItDll() throws Exception {
-        if (env.getProperty("autoit.skip.dll.installation.scan", Boolean.class, true)) {
+    private void installAutoItDll() throws IOException {
+        if (skipInstall) {
             return; // Skip installation
         }
 
         log.info("Checking AutoIt installation");
-        boolean installed = !checkIsItInstalled().equals("checker_1");
+        boolean installed = checkIsItInstalled().equals("checker_1");
         log.info("AutoIt already installed: " + installed);
         log.info(logger());
 
-        if (uninstall && !installed) {
-            log.info("Autoit already uninstalled.");
-            System.exit(0);
-        }
         if (uninstall && installed) {
             install();
             log.info("Autoit uninstalled.");
             System.exit(0);
         }
-        if (!uninstall && !installed) {
+        if (uninstall && !installed) {
+            log.info("Autoit already uninstalled.");
+            System.exit(0);
+        }
+        if (!uninstall) {
             install();
             log.info("Autoit installed.");
         }

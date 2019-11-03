@@ -1,4 +1,4 @@
-package autoit;
+package application;
 
 import autoitx4java.AutoItX;
 import org.slf4j.Logger;
@@ -17,19 +17,13 @@ public class Application implements CommandLineRunner {
     }
 
     @Autowired
-    private AutoItXInstaller autoItXInstaller;
-
-    @Autowired
     private AutoItX au;
 
     @Override
     public void run(final String... s) throws Exception {
         // Hint:
-        // You can turn off autoit.skip.dll.installation.scan in application.properties,
+        // You can turn off autoit.installation.skip in application.properties,
         // After first run. So it will skip scanning autoit installation
-
-        // Autoit Install
-        autoItXInstaller.installAutoItDll();
 
         // AutoIt Test
         au.run("calc.exe");
