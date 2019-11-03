@@ -5,6 +5,7 @@ import com.jacob.com.LibraryLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.function.Function;
 
-
+@Lazy
 @Component
 public class AutoItXInstaller {
     private static final Logger log = LoggerFactory.getLogger(AutoItXInstaller.class);
