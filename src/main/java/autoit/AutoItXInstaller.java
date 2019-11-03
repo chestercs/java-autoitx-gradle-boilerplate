@@ -2,23 +2,22 @@ package autoit;
 
 import autoitx4java.AutoItX;
 import com.jacob.com.LibraryLoader;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.function.Function;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Configuration
-class AutoItXInstaller {
+
+@Component
+public class AutoItXInstaller {
     private static final Logger log = LoggerFactory.getLogger(AutoItXInstaller.class);
     private static final Boolean JVM_ARCHITECH_32 = System.getProperty("sun.arch.data.model").contains("32");
     private static final String REGSVR_SERVICE_64 = "/Windows/System32/regsvr32.exe";
@@ -38,14 +37,16 @@ class AutoItXInstaller {
         this.env = env;
     }
 
-    AutoItX initAutoIt() throws IOException {
+    @Bean
+    public AutoItX initAutoIt() throws IOException {
         String JACOB_DLL_TO_USE = JVM_ARCHITECH_32 ? "autoit/jacob-1.19-x86.dll" : "autoit/jacob-1.19-x64.dll";
-        System.setProperty(LibraryLoader.JACOB_DLL_PATH, new ClassPathResource(JACOB_DLL_TO_USE).getFile().getAbsolutePath());
+        System.setProperty(LibraryLoader.JACOB_DLL_PATH,
+                ResourceUtils.getFile("classpath:" + JACOB_DLL_TO_USE).getAbsolutePath());
         return new AutoItX();
     }
 
-    void installAutoItDll() throws Exception {
-        if (env.getProperty("autoit.skip.dll.installation.scan", Boolean.class, false)) {
+    public void installAutoItDll() throws Exception {
+        if (env.getProperty("autoit.skip.dll.installation.scan", Boolean.class, true)) {
             return; // Skip installation
         }
 
